@@ -1,8 +1,8 @@
 import pygame
 
 fps = 60
-SCREEN_WIDTH = 1920
-SCREEN_HEIGHT = 1100
+SCREEN_WIDTH = 1800
+SCREEN_HEIGHT = 1000
 
 # rgb
 RED = (255, 0, 0)
