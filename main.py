@@ -27,8 +27,7 @@ from ui import UI
 
 pygame.init()
 
-global reference_dict
-reference_dict = {}
+img_dict = {}
 class Game:
     def __init__(self):
         pygame.init()
@@ -63,15 +62,15 @@ class Game:
     def load_image(self, image_name, scale):
         image = pygame.image.load(f"assets/{image_name}.png").convert_alpha()
         resized = pygame.transform.scale(image, scale)
-        reference_dict[image_name] = resized
-        print(reference_dict)
+        img_dict[image_name] = resized
+
 
     def enemy_spawn(self):
         randompos = randint(50,850)
         randomspeed = randint(3,7)
         #enemy_sprite = Enemy((1700, randompos), 1, "ice", 100, 20, "CannonLaserRocket", 200)
         #self.enemies.add(enemy_sprite)
-        sprite2 = Bomber((1900, randompos))
+        sprite2 = Bomber((1900, randompos), img_dict["bomber1"], img_dict["bomber2"])
         self.enemies.add(sprite2)
 
         #for x in self.level.queue1:
@@ -112,7 +111,7 @@ class Game:
                     pygame.quit()
                     sys.exit()
                 if event.type == ENEMY_SPAWN_COUNTDOWN:
-                    Game.enemy_spawn(self)
+                    self.enemy_spawn()
             self.screen.fill("black")
             dt = self.clock.tick(fps)
             self.level.run(dt)
@@ -147,7 +146,6 @@ current_time = pygame.time.get_ticks()
 ENEMY_SPAWN_COUNTDOWN = pygame.USEREVENT + 1
 pygame.time.set_timer(ENEMY_SPAWN_COUNTDOWN, 3000)
 
-#REFRESH =
 
 if __name__ == "__main__":
     game = Game()

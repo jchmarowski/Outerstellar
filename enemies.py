@@ -36,10 +36,10 @@ class Enemy(pygame.sprite.Sprite):
             self.kill()
 
 class Bomber(pygame.sprite.Sprite):
-    def __init__(self, pos):
+    def __init__(self, pos, image, image2):
         super().__init__()
-        enemy_image = reference_dict["bomber1"]
-        enemy_image2 = reference_dict["bomber2"]
+        enemy_image = image
+        enemy_image2 = image2
         self.sprites = []
         self.sprites.append(enemy_image)
         self.sprites.append(enemy_image2)
@@ -106,4 +106,4 @@ class Enemy_projectile(pygame.sprite.Sprite):
         if self.rect.x <= 0:
             self.kill()
 
-from main import reference_dict
+
