@@ -15,7 +15,7 @@ class Projectile(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = pos)
         self.rect.x += 30
         self.speed = speed
-        self.damage = 1
+        self.damage = 5
         self.piercing = False
 
     def update(self):

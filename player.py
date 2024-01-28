@@ -6,7 +6,7 @@ from math import *
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, boundary_width, boundary_height, speed):
         super().__init__()
-        img_size = (100, 100)
+        img_size = (120, 120)
         ship1 = pygame.image.load("assets/scout-ship.png").convert_alpha()
         ship1 = pygame.transform.scale(ship1, img_size)
         self.image = ship1
@@ -48,7 +48,7 @@ class Player(pygame.sprite.Sprite):
     def shoot1(self):
         self.projectiles.add(Projectile(self.rect.center, 30))
         self.projectiles.add(Flash(self.rect.center))
-        self.energy -= 200
+        self.energy -= 20
 
 
     def recharge(self):

@@ -3,21 +3,19 @@ from settings import *
 from enemies import Enemy
 from random import randint
 
+list_all = [[(2000, 80), 8, "scout1", 100, 10, "CannonLaserRocket", 200]]
+light_fighter_fast_top = [[(2000, 80), 8, "scout1", 100, 10, "CannonLaserRocket", 200], [(2000, 160), 7, "scout1", 120, 10, "CannonLaserRocket", 200], [(2000, 240), 6, "scout1", 120, 10, "CannonLaserRocket", 200], [(2000, 320), 5, "scout1", 120, 10, "CannonLaserRocket", 200]]
 
-
-light_fighter_wall = [[(2000, 150), 2, "light-fighter", 150, 20, "CannonLaserRocket", 200], [(2000, 250), 2, "light-fighter", 150, 20, "CannonLaserRocket", 200]]
-
-#                      (Enemy((2000, 300), 2, "light-fighter", 150, 20, "CannonLaserRocket", 200)), (Enemy((2000, 400), 2, "light-fighter", 150, 20, "CannonLaserRocket", 200)), (Enemy((2000, 450), 2, "light-fighter", 150, 20, "CannonLaserRocket", 200))]
-
-enemy_fodder_list = light_fighter_wall
+very_random = list_all
+enemy_formations_list = light_fighter_fast_top
 class Level:
     def __init__(self):
         small_stars_sprite = SmallStars()
         self.small_stars = pygame.sprite.Group(small_stars_sprite)
         big_stars_sprite = BigStars()
         self.big_stars = pygame.sprite.Group(big_stars_sprite)
-        self.stage = 0
-        self.queue1 = []
+        #self.timer = pygame.time.get_ticks()
+        #self.queue1 = []
 
 
 
@@ -30,9 +28,9 @@ class Level:
         if len(self.big_stars.sprites()) < 2:
             self.big_stars.add(BigStars())
         self.big_stars.update()
-        self.stage += 1 # 1 = 1 second
-        if self.stage % 300 == 0:
-            self.queue1 = light_fighter_wall
+        #self.queue1 = light_fighter_fast_top
+
+
 
 
 class SmallStars(pygame.sprite.Sprite):
@@ -65,15 +63,17 @@ class BigStars(pygame.sprite.Sprite):
         star_image = pygame.image.load("assets/star{}.png".format(self.type)).convert_alpha()
         star_image = pygame.transform.scale(star_image, (self.size, self.size))
         self.image = star_image
-        self.image.set_alpha(randint(120, 240))
+        self.image.set_alpha(80)
         self.pos = (randint(SCREEN_WIDTH - 400, SCREEN_WIDTH + 300), randint(0, SCREEN_HEIGHT - 200))
         self.rect = self.image.get_rect(center=self.pos)
         self.speed = 0 - randint(1,3)
+        self.shield = 20
+        self.energy = 100
 
     def update(self):
         self.rect.x += self.speed
         self.destroy()
-        self.image.set_alpha(randint(100,220))
+        self.image.set_alpha(randint(80,200))
     def destroy(self):
         if self.rect.x <= 0:
             self.kill()

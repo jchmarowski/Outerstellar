@@ -1,4 +1,4 @@
-import pygame
+
 
 fps = 60
 SCREEN_WIDTH = 1800
