@@ -13,9 +13,10 @@ class Projectile(pygame.sprite.Sprite):
         self.image.fill("cyan")
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(center = pos)
-        self.rect.x += 30
+        self.rect.x += 20
         self.speed = speed
         self.damage = 5
+        self.heat = 20
         self.piercing = False
 
     def update(self):
@@ -37,6 +38,7 @@ class Flash(pygame.sprite.Sprite):
         self.rect.x += 35
         self.speed = 5
         self.damage = 0
+        self.heat = 0
         self.piercing = True
 
     def update(self):
@@ -44,7 +46,6 @@ class Flash(pygame.sprite.Sprite):
         flash_alpha -= 30
         self.image.set_alpha(flash_alpha)
         self.rect.x += self.speed
-        #self.image.scroll(-1,0)
         if flash_alpha <= 40:
             self.kill()
             flash_alpha = 255

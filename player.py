@@ -4,12 +4,14 @@ from projectiles import Flash
 from math import *
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, boundary_width, boundary_height, speed):
+    def __init__(self, pos, img, img_hit, img_hot, img_shield, img_heat_shield , boundary_width, boundary_height, speed):
         super().__init__()
-        img_size = (120, 120)
-        ship1 = pygame.image.load("assets/scout-ship.png").convert_alpha()
-        ship1 = pygame.transform.scale(ship1, img_size)
-        self.image = ship1
+        self.normal_image = img
+        self.hit_image = img_hit
+        self.heat_image = img_hot
+        self.shielded_image = img_shield
+        self.heat_shield_image = img_heat_shield
+        self.image = self.normal_image
         self.mask = pygame.mask.from_surface(self.image)
         self.pos = pos
         self.rect = self.image.get_rect(center = pos)
@@ -23,10 +25,13 @@ class Player(pygame.sprite.Sprite):
         self.hp = self.max_hp
         self.max_energy = 1000
         self.energy = self.max_energy / 2
-        self.energy_gen = 0.45
-        self.shield = 100 # <<<<<<<<  This need to be separate entity. self.shieldsprite = pygame.sprite.GroupSinge()
-        self.heat = 20
+        self.energy_gen = 0.6
+        self.shield = 0
+        self.max_shield = 100
+        self.heat = 6
         self.projectiles = pygame.sprite.Group()
+        self.bullet_time = 1
+
 
     def get_input(self):
         keys = pygame.key.get_pressed()
@@ -43,12 +48,17 @@ class Player(pygame.sprite.Sprite):
             self.shoot1()
             self.s1_rdy = False
             self.s1_time = pygame.time.get_ticks()
+        if keys[pygame.K_s]:
+            self.bullet_time = 0.4
+        else:
+            self.bullet_time = 1
 
     # Use gun1 (A), position + speed.
     def shoot1(self):
-        self.projectiles.add(Projectile(self.rect.center, 30))
-        self.projectiles.add(Flash(self.rect.center))
-        self.energy -= 20
+        if self.energy > 100:
+            self.projectiles.add(Projectile(self.rect.center, 30))
+            self.projectiles.add(Flash(self.rect.center))
+            self.energy -= 20
 
 
     def recharge(self):
@@ -71,13 +81,21 @@ class Player(pygame.sprite.Sprite):
         self.boundary()
         self.recharge()
         self.projectiles.update()
-        # Player energy update
+        if self.heat > 5:
+            self.heat -= 0.001
+        else:
+            self.heat -= 0.0005
         if self.energy <= self.max_energy:
-            self.energy += self.energy_gen * ((self.max_energy - self.energy)/100)
+            self.energy += self.energy_gen * ((self.max_energy - self.energy)/150)
         elif self.energy > 2 * self.max_energy:
             self.energy = 2 * self.max_energy - 10
         else:
-            self.energy -= 1.5
-
-
-
+            self.energy -= 1
+        if self.shield > 30 and self.heat < 30:
+            self.image = self.shielded_image
+        elif self.shield < 30 and self.heat > 30:
+            self.image = self.heat_image
+        elif self.shield > 30 and self.heat > 30:
+            self.image = self.heat_shield_image
+        else:
+            self.image = self.normal_image
