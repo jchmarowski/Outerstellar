@@ -2,6 +2,16 @@ import pygame
 from projectiles import Projectile
 from projectiles import Flash
 from math import *
+from cards import Card
+
+# player.self_device_a = weapon / utility
+# Key_A = if device_a weapon:
+
+# Every second check if build slot 1 is free and build new card. If not proceed to slots 2 and 3.
+# Press Q, W, E to select slot 1, 2, 3. Selected card
+
+
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, img, img_hit, img_hot, img_shield, img_heat_shield , boundary_width, boundary_height, speed):
@@ -31,6 +41,8 @@ class Player(pygame.sprite.Sprite):
         self.heat = 6
         self.projectiles = pygame.sprite.Group()
         self.bullet_time = 1
+        self.hit = False
+        self.scrap = 0
 
 
     def get_input(self):
@@ -49,9 +61,13 @@ class Player(pygame.sprite.Sprite):
             self.s1_rdy = False
             self.s1_time = pygame.time.get_ticks()
         if keys[pygame.K_s]:
-            self.bullet_time = 0.4
+            self.bullet_time = 0.55
         else:
             self.bullet_time = 1
+        if keys[pygame.K_d]:
+            Card.new_card(self)
+
+
 
     # Use gun1 (A), position + speed.
     def shoot1(self):
@@ -91,7 +107,10 @@ class Player(pygame.sprite.Sprite):
             self.energy = 2 * self.max_energy - 10
         else:
             self.energy -= 1
-        if self.shield > 30 and self.heat < 30:
+        if self.hit:
+            self.image = self.hit_image
+            self.hit = False
+        elif self.shield > 30 and self.heat < 30:
             self.image = self.shielded_image
         elif self.shield < 30 and self.heat > 30:
             self.image = self.heat_image

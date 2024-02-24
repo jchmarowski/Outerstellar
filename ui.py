@@ -4,7 +4,7 @@ class UI:
     def __init__(self, surface, pos):
         self.display_surface = surface
         self.pos = pos
-        self.max_width = 300
+        self.max_width = 200
         self.height = 7
         self.font = pygame.font.Font("assets/ui/LazenbyCompSmooth.ttf", 24)
 
@@ -15,12 +15,12 @@ class UI:
         pygame.draw.rect(self.display_surface,"green",gauge_bar)
 
     def show_en(self, current, max):
-            current_value = current / max
-            current_bar_width = current_value * self.max_width
-            if current_bar_width > self.max_width:
-                current_bar_width = self.max_width
-            bar = pygame.Rect(self.pos, (current_bar_width, self.height))
-            pygame.draw.rect(self.display_surface,"#2A30FA",bar)
+        current_value = current / max
+        current_bar_width = current_value * self.max_width
+        if current_bar_width > self.max_width:
+            current_bar_width = self.max_width
+        bar = pygame.Rect(self.pos, (current_bar_width, self.height))
+        pygame.draw.rect(self.display_surface,"#2A30FA",bar)
 
     def show_oc(self, current, max):
         self.height = 9
@@ -70,3 +70,6 @@ class UI:
         counter_rect = counter_surf.get_rect(center=self.pos)
         self.display_surface.blit(counter_surf, counter_rect)
 
+class Ui_cards:
+    def slot_1_card(self, pos, image):
+        pass

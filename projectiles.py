@@ -7,7 +7,7 @@ flash_alpha = 250
 
 
 class Projectile(pygame.sprite.Sprite):
-    def __init__(self, pos, speed):
+    def __init__(self, pos, speed,):
         super().__init__()
         self.image = pygame.Surface((20,4))
         self.image.fill("cyan")
@@ -15,8 +15,8 @@ class Projectile(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = pos)
         self.rect.x += 20
         self.speed = speed
-        self.damage = 5
-        self.heat = 20
+        self.damage = 2
+        self.heat = 10
         self.piercing = False
 
     def update(self):
@@ -25,6 +25,8 @@ class Projectile(pygame.sprite.Sprite):
 
     def destroy(self):
         if self.rect.x >= 2000:
+            self.kill()
+        if self.rect.y < 0 or self.rect.y > 1100:
             self.kill()
 
 class Flash(pygame.sprite.Sprite):

@@ -1,14 +1,16 @@
 import random
 import sys
 import pygame
+from pygame.math import Vector2
 from random import randint
 from projectiles import Projectile
 from settings import *
 from player import Player
-from enemies import Enemy, Bomber, Enemy_projectile
+from enemies import Enemy, Bomber, Scout, Enemy_projectile, Scrap, Radar_ping
 from neutrals import Neutrals, Asteroid, Rock
 from level import Level, SmallStars, BigStars
 from ui import UI
+
 
 pygame.init()
 
@@ -23,13 +25,19 @@ class Game:
         self.level = Level()
 
         # Load all images
-        self.load_image("player-scout1", (100, 100))
-        self.load_image("player-scout2", (100, 100))
-        self.load_image("player-scout3", (100, 100))
-        self.load_image("player-scout4", (100, 100))
-        self.load_image("player-scout5", (100, 100))
-        self.load_image("bomber1", (120, 120))
-        self.load_image("bomber2", (120, 120))
+        self.load_image("player-scout1", (110, 110))
+        self.load_image("player-scout2", (110, 110))
+        self.load_image("player-scout3", (110, 110))
+        self.load_image("player-scout4", (110, 110))
+        self.load_image("player-scout5", (110, 110))
+
+        # enemies
+        self.load_image("bomber1", (110, 110))
+        self.load_image("bomber2", (110, 110))
+        self.load_image("scout1", (100, 100))
+        self.load_image("ping", (400, 200))
+
+        # neutrals
         self.load_image("star1", (60, 60))
         self.load_image("star2", (70, 70))
         self.load_image("star3", (80, 80))
@@ -41,8 +49,13 @@ class Game:
         self.load_image("rock2", (30, 30))
         self.load_image("rock3", (35, 35))
 
+        # UI
+        self.load_image("generator", (300, 300))
+
+
+
         # Init player and enemy groups.
-        player_sprite = Player((300,500), img_dict["player-scout1"], img_dict["player-scout2"], img_dict["player-scout3"], img_dict["player-scout4"], img_dict["player-scout5"], SCREEN_WIDTH, SCREEN_HEIGHT -160, 7)
+        player_sprite = Player((300,500), img_dict["player-scout1"], img_dict["player-scout2"], img_dict["player-scout3"], img_dict["player-scout4"], img_dict["player-scout5"], SCREEN_WIDTH, SCREEN_HEIGHT, 7)
         self.player = pygame.sprite.GroupSingle(player_sprite)
         self.bullet_time = 1
 
@@ -61,10 +74,10 @@ class Game:
         self.oc_bar = UI(self.screen,(330, 894))
         self.shield_bar = UI(self.screen,(30, 930))
         self.heat_bar = UI(self.screen,(30, 965))
-        self.counter_1 = UI(self.screen,(380,860))
-        self.counter_2 = UI(self.screen, (380, 895))
-        self.counter_3 = UI(self.screen, (380, 930))
-        self.counter_4 = UI(self.screen, (380, 965))
+        self.counter_1 = UI(self.screen,(270,860))
+        self.counter_2 = UI(self.screen, (270, 895))
+        self.counter_3 = UI(self.screen, (270, 930))
+        self.counter_4 = UI(self.screen, (270, 965))
 
     def load_image(self, image_name, scale):
         image = pygame.image.load(f"assets/{image_name}.png").convert_alpha()
@@ -74,23 +87,33 @@ class Game:
 
     def spawn(self):
         random_number = randint(0,50)
-        randompos = randint(50,820)
-        bomber = Bomber((1650, randompos), img_dict["bomber1"], img_dict["bomber2"], img_dict["bomber2"], img_dict["bomber2"])
+        randompos = randint(40,970)
+        bomber = Bomber((1750, randompos), img_dict["bomber1"], img_dict["bomber2"], img_dict["bomber2"], img_dict["bomber2"])
         self.enemies.add(bomber)
-        if random_number > 4:
+        if random_number > 45:
             asteroid = Asteroid((1750, randompos), img_dict["asteroid1"], img_dict["asteroid2"], img_dict["asteroid3"], img_dict["asteroid4"])
             self.neutrals.add(asteroid)
-        elif random_number > 1:
+        elif random_number > 40:
             rand_rock = random.choice(["rock1", "rock2", "rock3"])
             rock = Rock((1750, randompos), img_dict[rand_rock], img_dict[rand_rock], img_dict[rand_rock], img_dict[rand_rock])
             self.neutrals.add(rock)
+        elif random_number > 1:
+            scout = Scout((1750, randompos), img_dict["scout1"], img_dict["scout1"], img_dict["scout1"], img_dict["scout1"])
+            self.enemies.add(scout)
 
     def enemy_fire(self):
         for enemy in self.enemies:
             if enemy.weapon_ready == True:
-                attack = Enemy_projectile(enemy.rect.center, -6.0, enemy.weapon_damage)
-                self.enemy_projectiles.add(attack)
-                enemy.weapon_ready = False
+                if enemy.weapon_type == "standard":
+                    attack = Enemy_projectile(enemy.rect.center, enemy.weapon_damage, 0)
+                    self.enemy_projectiles.add(attack)
+                    enemy.weapon_ready = False
+                elif enemy.weapon_type == "radar":
+                    if enemy.rect.x > self.player.sprite.rect.x:
+                        radar = Radar_ping(enemy.rect.center, enemy.weapon_damage, 0, img_dict["ping"], self.player.sprite.rect.center)
+                        self.enemy_projectiles.add(radar)
+                        enemy.weapon_ready = False
+
 
 
     def collision_checks(self):
@@ -98,7 +121,7 @@ class Game:
         player_hitting_neutrals = pygame.sprite.groupcollide(self.neutrals, self.player.sprite.projectiles, False, False, pygame.sprite.collide_mask)
         player_crashing_enemies = pygame.sprite.groupcollide(self.player, self.enemies, False, False, pygame.sprite.collide_mask)
         player_crashing_neutrals = pygame.sprite.groupcollide(self.player, self.neutrals, False, False, pygame.sprite.collide_mask)
-        enemies_hitting_player = pygame.sprite.groupcollide(self.player, self.enemy_projectiles, False, True, pygame.sprite.collide_mask)
+        enemies_hitting_player = pygame.sprite.groupcollide(self.player, self.enemy_projectiles, False, False, pygame.sprite.collide_mask)
 
         for enemy, projectiles in player_hitting_enemies.items():
             for projectile in projectiles:
@@ -109,18 +132,10 @@ class Game:
                 if not projectile.piercing:
                     projectile.kill()
                 if enemy.hp <= 0:
-                    enemy.kill()
-        for player, enemies in player_crashing_enemies.items():
-            for enemy in enemies:
-                player.hp -= enemy.collision_damage
-                enemy.hp -= 10
-                if enemy.hp <= 0:
-                    enemy.kill()
-        for player, enemy_projectiles in enemies_hitting_player.items():
-            for projectile in enemy_projectiles:
-                player.hp -= projectile.damage + projectile.damage * (player.heat/100)
-                if player.heat < 100:
-                    player.heat += projectile.heat
+                    enemy.destroy()
+                    if enemy.scrap > 0:
+                        scrap_spawn = Scrap(enemy.rect.center, 0, enemy.scrap)
+                        self.enemy_projectiles.add(scrap_spawn)
         for neutral, projectiles in player_hitting_neutrals.items():
             for projectile in projectiles:
                 neutral.hp -= projectile.damage + projectile.damage * (neutral.heat / 100)
@@ -131,12 +146,31 @@ class Game:
                     projectile.kill()
                 if neutral.hp <= 0:
                     neutral.kill()
+        for player, enemies in player_crashing_enemies.items():
+            for enemy in enemies:
+                player.hp -= enemy.collision_damage
+                enemy.hp -= 10
+                if enemy.hp <= 0:
+                    enemy.kill()
         for player, neutrals in player_crashing_neutrals.items():
             for neutral in neutrals:
                 player.hp -= neutral.damage
                 neutral.hp -= 10
                 if neutral.hp <= 0:
                     neutral.kill()
+        for player, enemy_projectiles in enemies_hitting_player.items():
+            for projectile in enemy_projectiles:
+                player.hp -= projectile.damage + projectile.damage * (player.heat/100)
+                player.hit = True
+                player.scrap += projectile.scrap
+                if not projectile.piercing:
+                    projectile.kill()
+                if player.heat < 100:
+                    player.heat += projectile.heat
+
+
+
+
     def run(self):
         while True:
             for event in pygame.event.get():
@@ -152,7 +186,15 @@ class Game:
             self.level.run(dt)
             self.collision_checks()
             self.bullet_time = self.player.sprite.bullet_time
-            #Player, enemies
+            # Background
+            if len(self.small_stars.sprites()) < 100:
+                self.small_stars.add(SmallStars())
+            self.big_stars.update(self.bullet_time)
+            self.small_stars.update(self.bullet_time)
+            self.big_stars.draw(self.screen)
+            self.small_stars.draw(self.screen)
+
+            #Player, enemies, neutrals
             self.enemies.update(self.bullet_time)
             self.enemies.draw(self.screen)
             self.enemy_projectiles.update(self.bullet_time)
@@ -174,13 +216,6 @@ class Game:
             self.counter_2.counter_en(self.player.sprite.energy)
             self.counter_3.counter_shield(self.player.sprite.shield)
             self.counter_4.counter_heat(self.player.sprite.heat)
-            # Background
-            if len(self.small_stars.sprites()) < 100:
-                self.small_stars.add(SmallStars())
-            self.big_stars.update(self.bullet_time)
-            self.small_stars.update(self.bullet_time)
-            self.big_stars.draw(self.screen)
-            self.small_stars.draw(self.screen)
             pygame.display.update()
 
 current_time = pygame.time.get_ticks()

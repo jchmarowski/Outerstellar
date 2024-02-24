@@ -19,16 +19,16 @@ while True:
 
 # Things to do:
 
+# Sort out UI. Add scrap counter.
 # Enemies dont have heat sprite animation.
 # Add bounce to crashes with enemies and neutrals
-# Add game stages: combat-slow, combat-heavy, combat-environment, combat-boss, space-station.
+# Add stage stages: combat-slow, combat-heavy, combat-environment, combat-boss.
+# Add game status: menu, play, space-station, world map.
 # When dead restart stage.
 # Add targeting - vector2? Plus homing for missiles.
 # Build classes for all units.
 # Make OC bar charge left.
-# Give weapons restrictions and recharge bonus from energy. Supercharge.
 # Build device constructor. >_<
-# Build spawner settings in Level.
-# Add comets, but as enemy or neutral?
-# Bullet Time is working ok at 0.4, just needs command to activate it. Line 58
-# World map? (im getting carried away...)
+# Bullet Time is working ok at 0.55, just needs command to activate it. Line 58
+
+# from pygame.math import Vector2

@@ -10,7 +10,6 @@ class Level:
 
     def run(self, dt):
         pass
-        #self.queue1 = light_fighter_fast_top
 
 
 
@@ -22,7 +21,7 @@ class SmallStars(pygame.sprite.Sprite):
         self.image = pygame.Surface((2, 2))
         self.image.fill("white")
         self.image.set_alpha(40 * random_num)
-        self.pos = (randint(SCREEN_WIDTH - 400, SCREEN_WIDTH + 400), randint(0, SCREEN_HEIGHT - 150))
+        self.pos = (randint(SCREEN_WIDTH - 400, SCREEN_WIDTH + 400), randint(0, SCREEN_HEIGHT))
         self.rect = self.image.get_rect(center=self.pos)
         self.speed = 0 - random_num
 
@@ -50,7 +49,7 @@ class BigStars(pygame.sprite.Sprite):
             self.image = star3
             self.shield = 20
             self.energy = 100
-        self.pos = (SCREEN_WIDTH + 50, randint(0, SCREEN_HEIGHT - 180))
+        self.pos = (SCREEN_WIDTH + 50, randint(0, SCREEN_HEIGHT))
         self.rect = self.image.get_rect(center=self.pos)
         self.speed = 0 - randint(1,3)
 
